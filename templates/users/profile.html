@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Profile - ExpenseFlow{% endblock %}
+{% block page_title %}Profile{% endblock %}
+{% block page_subtitle %}Manage your personal information{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="ef-card p-4 text-center">
+      {% if profile.avatar %}
+        <img src="{{ profile.avatar.url }}" class="rounded-circle mb-3" style="width:96px;height:96px;object-fit:cover;">
+      {% else %}
+        <div class="avatar-circle mx-auto mb-3" style="width:96px;height:96px;font-size:2.2rem;">
+          {{ user.first_name|first|upper|default:user.username|first|upper }}
+        </div>
+      {% endif %}
+      <h5 class="fw-bold mb-0">{{ user.get_full_name|default:user.username }}</h5>
+      <div class="text-muted-ef small mb-3">{{ user.email }}</div>
+      <div class="text-muted-ef small">Member since {{ user.date_joined|date:"M Y" }}</div>
+    </div>
+
+    <div class="ef-card p-4 mt-3">
+      <div class="d-flex justify-content-between mb-3">
+        <span class="text-muted-ef small">Total Expenses</span>
+        <span class="fw-bold">{{ currency_symbol }}{{ total_expenses|floatformat:2 }}</span>
+      </div>
+      <div class="d-flex justify-content-between mb-3">
+        <span class="text-muted-ef small">Total Categories</span>
+        <span class="fw-bold">{{ total_categories }}</span>
+      </div>
+      <div class="d-flex justify-content-between">
+        <span class="text-muted-ef small">This Month</span>
+        <span class="fw-bold">{{ currency_symbol }}{{ monthly_spending|floatformat:2 }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="ef-card p-4">
+      <h6 class="section-title mb-3">Edit Profile</h6>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Full Name</label>
+            {{ form.name }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Phone Number</label>
+            {{ form.phone }}
+            {% for error in form.phone.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" value="{{ user.email }}" disabled>
+          <div class="form-text">Contact support to change your registered email.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Profile Picture</label>
+          {{ form.avatar }}
+        </div>
+        <button type="submit" class="btn btn-gradient px-4"><i class="bi bi-check-lg"></i> Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

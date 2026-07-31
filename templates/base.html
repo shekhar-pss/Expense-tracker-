@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}ExpenseFlow{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+{% block extra_head %}{% endblock %}
+</head>
+<body class="{% if dark_mode %}dark-mode{% endif %}">
+
+<div class="app-shell">
+  {% include 'partials/sidebar.html' %}
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-light sidebar-toggle-btn border" id="sidebarToggle">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <div>
+          <h4 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h4>
+          <div class="text-muted-ef small">{% block page_subtitle %}Welcome back to ExpenseFlow{% endblock %}</div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-light border rounded-circle" id="darkModeToggle" title="Toggle dark mode">
+          <i class="bi {% if dark_mode %}bi-sun{% else %}bi-moon-stars{% endif %}"></i>
+        </button>
+        <a href="{% url 'expenses:add_expense' %}" class="btn btn-gradient rounded-3 px-3">
+          <i class="bi bi-plus-lg"></i> Add Expense
+        </a>
+        <a href="{% url 'users:profile' %}" class="avatar-circle text-decoration-none" title="Profile">
+          {% if user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}
+        </a>
+      </div>
+    </div>
+
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="fade-in">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.3/chart.umd.min.js"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

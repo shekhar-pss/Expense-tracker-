@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Reports - ExpenseFlow{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block page_subtitle %}Generate and export spending reports{% endblock %}
+
+{% block content %}
+<div class="ef-card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label mb-1">Period</label>
+      <select name="date_filter" id="date_filter" class="form-select">
+        <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Daily (Today)</option>
+        <option value="last_7_days" {% if date_filter == 'last_7_days' %}selected{% endif %}>Weekly (Last 7 Days)</option>
+        <option value="this_month" {% if date_filter == 'this_month' %}selected{% endif %}>Monthly (This Month)</option>
+        <option value="this_year" {% if date_filter == 'this_year' %}selected{% endif %}>Yearly (This Year)</option>
+        <option value="custom" {% if date_filter == 'custom' %}selected{% endif %}>Custom Range</option>
+      </select>
+    </div>
+    <div id="customDateFields" class="col-md-5 d-flex gap-2" style="display: {% if date_filter == 'custom' %}flex{% else %}none{% endif %};">
+      <div class="flex-fill">
+        <label class="form-label mb-1">From</label>
+        <input type="date" name="start_date" value="{{ start_date }}" class="form-control">
+      </div>
+      <div class="flex-fill">
+        <label class="form-label mb-1">To</label>
+        <input type="date" name="end_date" value="{{ end_date }}" class="form-control">
+      </div>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-gradient w-100">Generate</button>
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+      <a href="?{{ request.GET.urlencode }}&export=csv" class="btn btn-soft flex-fill" title="Export CSV"><i class="bi bi-filetype-csv"></i></a>
+      <a href="?{{ request.GET.urlencode }}&export=pdf" class="btn btn-soft flex-fill" title="Export PDF"><i class="bi bi-filetype-pdf"></i></a>
+      <a href="?{{ request.GET.urlencode }}&export=excel" class="btn btn-soft flex-fill" title="Export Excel"><i class="bi bi-file-earmark-excel"></i></a>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="ef-card p-3">
+      <div class="text-muted-ef small fw-bold">TOTAL FOR PERIOD</div>
+      <div class="fs-4 fw-bold">{{ currency_symbol }}{{ total.total|default:0|floatformat:2 }}</div>
+      <div class="text-muted-ef small">{{ total.count }} expense{{ total.count|pluralize }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="ef-card p-3">
+      <div class="text-muted-ef small fw-bold mb-2">BY CATEGORY</div>
+      {% for c in by_category|slice:":4" %}
+        <div class="d-flex justify-content-between small mb-1">
+          <span>{{ c.category__name }}</span><span class="fw-bold">{{ currency_symbol }}{{ c.total|floatformat:2 }}</span>
+        </div>
+      {% empty %}<div class="text-muted-ef small">No data.</div>{% endfor %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="ef-card p-3">
+      <div class="text-muted-ef small fw-bold mb-2">BY PAYMENT METHOD</div>
+      {% for p in by_payment %}
+        <div class="d-flex justify-content-between small mb-1">
+          <span>{{ p.payment_method_display }}</span><span class="fw-bold">{{ currency_symbol }}{{ p.total|floatformat:2 }}</span>
+        </div>
+      {% empty %}<div class="text-muted-ef small">No data.</div>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="ef-card p-3">
+  {% if expenses %}
+  <div class="table-responsive">
+    <table class="table ef-table mb-0">
+      <thead><tr><th>Date</th><th>Title</th><th>Category</th><th>Payment</th><th class="text-end">Amount</th></tr></thead>
+      <tbody>
+        {% for e in expenses %}
+        <tr>
+          <td class="text-muted-ef">{{ e.date }}</td>
+          <td class="fw-semibold">{{ e.title }}</td>
+          <td><span class="category-pill">{{ e.category.name }}</span></td>
+          <td><span class="payment-badge">{{ e.get_payment_method_display }}</span></td>
+          <td class="text-end fw-bold">{{ currency_symbol }}{{ e.amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if total.count > 100 %}<p class="text-muted-ef small mt-2 mb-0">Showing first 100 of {{ total.count }} — export for the full report.</p>{% endif %}
+  {% else %}
+  <div class="empty-state"><i class="bi bi-file-earmark-bar-graph"></i><p class="mb-0">No expenses found for this period.</p></div>
+  {% endif %}
+</div>
+{% endblock %}
