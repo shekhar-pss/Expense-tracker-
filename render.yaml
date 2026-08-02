@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: expenseflow
+    runtime: python
+    plan: free
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: expenseflow-db
+          property: connectionString
+
+databases:
+  - name: expenseflow-db
+    plan: free
