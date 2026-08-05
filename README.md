@@ -1,6 +1,6 @@
 # ExpenseFlow
 
-A modern web app , full-stack expense tracker built with **Django**, **Django REST Framework**, **Bootstrap 5**, and **Chart.js**. Track expenses, categorize spending, view analytics, generate reports, and manage your budget — all in a clean, premium UI with light/dark mode.
+A modern web application , full-stack expense tracker built with **Django**, **Django REST Framework**, **Bootstrap 5**, and **Chart.js**. Track expenses, categorize spending, view analytics, generate reports, and manage your budget — all in a clean, premium UI with light/dark mode.
 
 ---
 
